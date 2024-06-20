@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import {
   Call,
@@ -9,8 +9,11 @@ import {
   MicRounded,
   SendOutlined,
 } from "@mui/icons-material";
+import EmojiPicker from "emoji-picker-react";
 
 function Chat() {
+  // opening emoji picker
+  const [openEmoji, setOpenEmoji] = useState(false);
   return (
     <div className=" flex flex-col flex-[100px] border-r-2 border-gray-700">
       <div className=" flex justify-between items-center p-[20px] border-b-2 border-gray-700">
@@ -99,7 +102,7 @@ function Chat() {
           <span className=" text-xs">1 min ago</span>
         </div>
       </div>
-      <div className="bottom flex items-center py-3 border-t-2 border-gray-700">
+      <div className="bottom flex items-center py-3 border-t-2 border-gray-700 relative">
         <div className=" flex gap-[10px] p-5 mt-auto">
           <Image className=" cursor-pointer" />
           <CameraAlt className=" cursor-pointer" />
@@ -111,7 +114,13 @@ function Chat() {
             placeholder="Type a message..."
             className=" bg-transparent outline-none flex-1 py-1"
           />
-          <EmojiEmotions className=" cursor-pointer" />
+          <span onClick={() => setOpenEmoji((prev) => !prev)}>
+            {" "}
+            <EmojiEmotions className=" cursor-pointer" />
+          </span>
+        </div>
+        <div className=" absolute bottom-[60px] right-0 ">
+          <EmojiPicker open={openEmoji} />
         </div>
         <div className=" mx-5 bg-gray-700 p-1 rounded-md cursor-pointer">
           <SendOutlined />
