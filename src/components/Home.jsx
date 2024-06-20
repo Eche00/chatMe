@@ -5,10 +5,12 @@ import Details from "./Details/Details";
 
 function Home() {
   return (
-    <div className="bg-[#081b29] h-screen ">
-      <List />
-      <Chat />
-      <Details />
+    <div className=" w-[100%] h-screen flex items-center justify-center bg-black  ">
+      <div className="bg-[#081b29] h-[90%] w-[90%] rounded-md flex text-white ">
+        <List />
+        <Chat />
+        <Details />
+      </div>
     </div>
   );
 }
