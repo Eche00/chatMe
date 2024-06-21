@@ -6,12 +6,18 @@ import {
   QuestionAnswerTwoTone,
 } from "@mui/icons-material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Link } from "react-router-dom";
-import { look, instagram, facebook, google } from "../assets";
+import { Link, useNavigate } from "react-router-dom";
+import { look, instagram, facebook, google, profile } from "../assets";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import upload from "../lib/uploads";
 
 function SignUp() {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [avatar, setAvatar] = useState({
     file: null,
     url: "",
@@ -30,9 +36,43 @@ function SignUp() {
     }
   };
   // handling form submit(Registering account)
-  const handleSubmit = async (e) => {
+  const handleRegistration = async (e) => {
     e.preventDefault();
-    toast.error("Working");
+    setLoading(true);
+    // getting formdata
+    const formData = new FormData(e.target);
+    const { username, email, password } = Object.fromEntries(formData);
+
+    try {
+      // creating user with formdata (email & password)
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+
+      // storing image on firebase storage
+      const imgUrl = await upload(avatar.file);
+
+      // adding user cresidentials to firestore db
+      await setDoc(doc(db, "users", res.user.uid), {
+        username,
+        email,
+        avatar: imgUrl,
+        id: res.user.uid,
+        blocked: [],
+      });
+
+      // adding user chats to firestore db for later access
+      await setDoc(doc(db, "userchats", res.user.uid), {
+        chats: [],
+      });
+      //notification msg
+      toast.success("Account created");
+      // after success , this would navigate user to sign in page
+      navigate("/signin");
+    } catch (error) {
+      // handling error to be displayed
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className=" h-screen flex justify-center items-center   bg-[#081b29]">
@@ -62,7 +102,7 @@ function SignUp() {
           {/* right body (sign up form) */}
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={handleRegistration}
             className="flex flex-col  items-center justify-center">
             <h2 className="text-gray-300 text-3xl font-serif">Sign Up</h2>
             {/* profile image section */}
@@ -77,16 +117,13 @@ function SignUp() {
               />
 
               <img
-                className=" w-[50px] h-[50px] object-cover rounded-[50%]  cursor-pointer"
+                className=" w-[50px] h-[50px] object-cover rounded-[50%]  cursor-pointer border-2 border-gray-700"
                 onClick={() => profileRef.current.click()}
-                src={
-                  avatar.url ||
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
-                }
+                src={avatar.url || profile}
                 alt=""
               />
               <h2 className=" text-white text-sm font-bold">
-                <ArrowBackIos fontSize="small" /> Upload profile imagd
+                <ArrowBackIos fontSize="small" /> Upload profile image
               </h2>
             </div>
 
@@ -96,8 +133,10 @@ function SignUp() {
                 <AccountCircleIcon />
                 <input
                   className=" bg-transparent h-10 p-2 text-sm font-bold  w-[100%] text-gray-300 outline-none"
-                  type="email"
-                  placeholder="Email"
+                  type="text"
+                  placeholder="Username"
+                  name="username"
+                  required
                 />
               </div>
 
@@ -108,6 +147,8 @@ function SignUp() {
                   className=" bg-transparent h-10 p-2 text-sm font-bold  w-[100%] text-gray-300 outline-none"
                   type="email"
                   placeholder="Email"
+                  name="email"
+                  required
                 />
 
                 {/* password */}
@@ -116,14 +157,17 @@ function SignUp() {
                 <KeyOutlined />
                 <input
                   className=" bg-transparent h-10 p-2 text-sm font-bold  w-[100%] text-gray-300 outline-none"
-                  type="password"
+                  type="text"
                   placeholder="Password"
+                  name="password"
                 />
               </div>
 
               {/*signup button */}
-              <button className="w-fit p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90">
-                SignUp
+              <button
+                className="w-fit p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600"
+                disabled={loading}>
+                {loading ? "Loading.." : "SignUp"}
               </button>
               <p className=" text-[12px] text-gray-400 ">
                 Have an account ?{" "}
