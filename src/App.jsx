@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SignUp from "./pages/Signup";
 import Signin from "./pages/Signin";
 import Home from "./components/Home";
+import Notification from "./components/Notification/Notification";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/" element={<Home />} />
         </Routes>
+        <Notification />
       </Router>
     </div>
   );

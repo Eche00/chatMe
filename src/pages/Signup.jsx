@@ -9,6 +9,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Link } from "react-router-dom";
 import { look, instagram, facebook, google } from "../assets";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 function SignUp() {
   const [avatar, setAvatar] = useState({
@@ -27,6 +28,11 @@ function SignUp() {
         url: URL.createObjectURL(e.target.files[0]),
       });
     }
+  };
+  // handling form submit(Registering account)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    toast.error("Working");
   };
   return (
     <div className=" h-screen flex justify-center items-center   bg-[#081b29]">
@@ -55,7 +61,9 @@ function SignUp() {
 
           {/* right body (sign up form) */}
 
-          <form className="flex flex-col  items-center justify-center">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col  items-center justify-center">
             <h2 className="text-gray-300 text-3xl font-serif">Sign Up</h2>
             {/* profile image section */}
 
