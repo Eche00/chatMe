@@ -32,7 +32,7 @@ function Signin() {
             />
           </motion.section>
 
-          <article className="flex flex-col  items-center justify-center">
+          <form className="flex flex-col  items-center justify-center">
             <h2 className="text-gray-300 text-3xl font-serif">Sign In</h2>
 
             <div className="flex flex-col  sm:w-[500px] w-[300px] gap-5 justify-center items-center mt-5">
@@ -69,7 +69,7 @@ function Signin() {
                 alt=""
               />
             </div>
-          </article>
+          </form>
         </section>
         <section className="flex flex-col justify-center items-center text-sm my-2">
           <p className="text-gray-400">Welcome to chatMe 👋</p>

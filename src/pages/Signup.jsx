@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
-  ArrowBack,
+  ArrowBackIos,
   EmailOutlined,
   KeyOutlined,
   QuestionAnswerTwoTone,
@@ -11,14 +11,34 @@ import { look, instagram, facebook, google } from "../assets";
 import { motion } from "framer-motion";
 
 function SignUp() {
+  const [avatar, setAvatar] = useState({
+    file: null,
+    url: "",
+  });
+
+  // accessing profile image selection through input ref
+  const profileRef = useRef(null);
+
+  // handling avatar upload
+  const handleAvatarUpload = (e) => {
+    if (e.target.files[0]) {
+      setAvatar({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
   return (
     <div className=" h-screen flex justify-center items-center   bg-[#081b29]">
+      {/* All page */}
+
       <div className=" max-w-[100%] mx-auto">
         <h1 className=" text-4xl font-serif text-center flex items-center justify-center p-2 text-gray-300 my-5">
           <QuestionAnswerTwoTone fontSize="100px" />
           chat<span className=" font-bold">Me</span>
         </h1>
         <section className="flex  w-full justify-between p-5 sm:flex-row flex-col   sm:border-solid border-none ">
+          {/* left body */}
           <motion.section
             initial={{ rotate: 0 }}
             whileInView={{
@@ -33,10 +53,37 @@ function SignUp() {
             />
           </motion.section>
 
-          <article className="flex flex-col  items-center justify-center">
+          {/* right body (sign up form) */}
+
+          <form className="flex flex-col  items-center justify-center">
             <h2 className="text-gray-300 text-3xl font-serif">Sign Up</h2>
+            {/* profile image section */}
+
+            <div className="flex items-center justify-between w-full">
+              <input
+                type="file"
+                name="avatar"
+                hidden
+                ref={profileRef}
+                onChange={handleAvatarUpload}
+              />
+
+              <img
+                className=" w-[50px] h-[50px] object-cover rounded-[50%]  cursor-pointer"
+                onClick={() => profileRef.current.click()}
+                src={
+                  avatar.url ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
+                }
+                alt=""
+              />
+              <h2 className=" text-white text-sm font-bold">
+                <ArrowBackIos fontSize="small" /> Upload profile imagd
+              </h2>
+            </div>
 
             <div className="flex flex-col  sm:w-[500px] w-[300px] gap-5 justify-center items-center mt-5">
+              {/* username */}
               <div className="text-gray-300 px-2 flex justify-center items-center  bg-gray-600 rounded-md w-[100%]">
                 <AccountCircleIcon />
                 <input
@@ -45,6 +92,8 @@ function SignUp() {
                   placeholder="Email"
                 />
               </div>
+
+              {/* email*/}
               <div className="text-gray-300 px-2 flex justify-center items-center  bg-gray-600 rounded-md w-[100%]">
                 <EmailOutlined />
                 <input
@@ -52,6 +101,8 @@ function SignUp() {
                   type="email"
                   placeholder="Email"
                 />
+
+                {/* password */}
               </div>
               <div className="text-gray-300 px-2 flex justify-center items-center  bg-gray-600 rounded-md w-[100%]">
                 <KeyOutlined />
@@ -61,6 +112,8 @@ function SignUp() {
                   placeholder="Password"
                 />
               </div>
+
+              {/*signup button */}
               <button className="w-fit p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90">
                 SignUp
               </button>
@@ -72,14 +125,17 @@ function SignUp() {
                 </span>
               </p>
 
+              {/* google signup */}
               <img
                 className=" hover:size-[20%] h-[40px] cursor-pointer"
                 src={google}
                 alt=""
               />
             </div>
-          </article>
+          </form>
         </section>
+
+        {/* footer section */}
         <section className="flex flex-col justify-center items-center text-sm my-2">
           <p className="text-gray-400">Welcome to chatMe 👋</p>
           <div className="flex justify-center items-center gap-1 w-[100%] my-10">
