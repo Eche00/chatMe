@@ -4,8 +4,6 @@ import SignUp from "./pages/Signup";
 import Signin from "./pages/Signin";
 import Home from "./components/Home";
 import Notification from "./components/Notification/Notification";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./lib/firebase";
 
 function App() {
   return (

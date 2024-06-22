@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { toast } from "react-toastify";
+import { Spinner } from "flowbite-react";
 
 function Signin() {
   const [loading, setLoading] = useState(false);
@@ -94,8 +95,17 @@ function Signin() {
               </div>
 
               {/*signin button */}
-              <button className="w-fit p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90">
-                {loading ? "Loading.." : "SignIn"}
+              <button
+                className=" p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 flex"
+                disabled={loading}>
+                {loading ? (
+                  <>
+                    <Spinner className=" w-[20px] h-[20px]" size="sm" />
+                    <span className=" pl-3">Loading...</span>
+                  </>
+                ) : (
+                  "SignIn"
+                )}
               </button>
               <p className=" text-[12px] text-gray-400 ">
                 Don't Have an account ?{" "}

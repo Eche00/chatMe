@@ -14,6 +14,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import upload from "../lib/uploads";
+import { Spinner } from "flowbite-react";
 
 function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -165,9 +166,16 @@ function SignUp() {
 
               {/*signup button */}
               <button
-                className="w-fit p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600"
+                className=" p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 flex"
                 disabled={loading}>
-                {loading ? "Loading.." : "SignUp"}
+                {loading ? (
+                  <>
+                    <Spinner className=" w-[20px] h-[20px]" size="sm" />
+                    <span className=" pl-3">Loading...</span>
+                  </>
+                ) : (
+                  "SignUp"
+                )}
               </button>
               <p className=" text-[12px] text-gray-400 ">
                 Have an account ?{" "}
