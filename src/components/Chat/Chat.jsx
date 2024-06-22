@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import {
   Call,
@@ -10,10 +10,92 @@ import {
   SendOutlined,
 } from "@mui/icons-material";
 import EmojiPicker from "emoji-picker-react";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/userStore";
 
 function Chat() {
-  // opening emoji picker
   const [openEmoji, setOpenEmoji] = useState(false);
+  const [text, setText] = useState("");
+  const [chat, setChat] = useState();
+  console.log(chat.messages + "hello");
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
+
+  // end of chat reference to always move the chat to the current messages
+  const endRef = useRef(null);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, []);
+
+  //
+  useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [chatId]);
+
+  // handling emoji picker
+  const handleEmoji = (e) => {
+    setText((prev) => prev + e.emoji);
+    setOpenEmoji(false);
+  };
+
+  // handling  sending message
+  const handleSend = async (e) => {
+    e.preventDefault;
+    // handling empty text
+    if (text === "") return;
+
+    // adding msg to db
+    try {
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+        }),
+      });
+      //creating a loop to keep users updated by last messages
+      const userIDs = [currentUser.id, user.id];
+
+      userIDs.forEach(async (id) => {
+        const userChatsRef = doc(db, "userchats", id);
+        const userChatSnapshot = await getDoc(userChatsRef);
+
+        if (userChatSnapshot.exists()) {
+          const userChatData = userChatSnapshot.data();
+
+          // getting specific chat being updated
+          const chatIndex = userChatData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+          userChatData.chats[chatIndex].lastMessage = text;
+          userChatData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatData.chats[chatIndex].updatedAt = Date.now();
+
+          //updating recent chat to top of page
+          await updateDoc(userChatsRef, {
+            chats: userChatData.chats,
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className=" flex flex-col flex-[100px] border-r-2 border-gray-700">
       <div className=" flex justify-between items-center p-[20px] border-b-2 border-gray-700">
@@ -61,46 +143,24 @@ function Chat() {
           </div>
         </div>
 
-        <div className=" flex flex-col self-end  max-w-[70%] ">
-          <img
-            className=" w-[100%] h-[300px] object-cover rounded-md"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
-            alt=""
-          />
-          <p className="bg-blue-500 p-[10px] rounded-[10px]">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores
-            qui porro a numquam necessitatibus minima beatae perferendis quos
-            hic sit debitis nulla nemo quaerat incidunt corporis laboriosam
-            autem, nobis assumenda.
-          </p>
-          <span className=" text-xs">1 min ago</span>
-        </div>
-        <div className=" flex gap-[20px]">
-          <img
-            className=" w-[30px] h-[30px] object-cover rounded-[50%]"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
-            alt=""
-          />
-          <div className=" max-w-[70%] flex-1 flex flex-col gap-[5px]">
-            <p className=" p-[10px] bg-[#8f8faa41] rounded-[10px]">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Asperiores qui porro a numquam necessitatibus minima beatae
-              perferendis quos hic sit debitis nulla nemo quaerat incidunt
-              corporis laboriosam autem, nobis assumenda.
+        {chat.messages.map((message) => {
+          <div
+            className=" flex flex-col self-end  max-w-[70%] "
+            key={message?.createdAt}>
+            {message.img && (
+              <img
+                className=" w-[100%] h-[300px] object-cover rounded-md"
+                src={message.img}
+                alt=""
+              />
+            )}
+            <p className="bg-blue-500 p-[10px] rounded-[10px]">
+              {message.text}
             </p>
             <span className=" text-xs">1 min ago</span>
-          </div>
-        </div>
-
-        <div className=" flex flex-col self-end  max-w-[70%] ">
-          <p className="bg-blue-500 p-[10px] rounded-[10px]">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores
-            qui porro a numquam necessitatibus minima beatae perferendis quos
-            hic sit debitis nulla nemo quaerat incidunt corporis laboriosam
-            autem, nobis assumenda.
-          </p>
-          <span className=" text-xs">1 min ago</span>
-        </div>
+          </div>;
+        })}
+        <div ref={endRef}></div>
       </div>
       <div className="bottom flex items-center py-3 border-t-2 border-gray-700 relative">
         <div className=" flex gap-[10px] p-5 mt-auto">
@@ -113,6 +173,8 @@ function Chat() {
             type="text"
             placeholder="Type a message..."
             className=" bg-transparent outline-none flex-1 py-1"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
           <span onClick={() => setOpenEmoji((prev) => !prev)}>
             {" "}
@@ -120,9 +182,11 @@ function Chat() {
           </span>
         </div>
         <div className=" absolute bottom-[60px] right-0 ">
-          <EmojiPicker open={openEmoji} />
+          <EmojiPicker onEmojiClick={handleEmoji} open={openEmoji} />
         </div>
-        <div className=" mx-5 bg-gray-700 p-1 rounded-md cursor-pointer">
+        <div
+          className=" mx-5 bg-gray-700 p-1 rounded-md cursor-pointer"
+          onClick={handleSend}>
           <SendOutlined />
         </div>
       </div>

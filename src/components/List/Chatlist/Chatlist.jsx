@@ -5,6 +5,7 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useUserStore } from "../../../lib/userStore";
 import { db } from "../../../lib/firebase";
 import { profile } from "../../../assets";
+import { useChatStore } from "../../../lib/chatStore";
 
 function Chatlist() {
   //handle add mode
@@ -13,6 +14,7 @@ function Chatlist() {
 
   //getting current user info(id)
   const { currentUser } = useUserStore();
+  const { chatId, changeChat } = useChatStore();
 
   // use effect to handle user chats to show on page load
   useEffect(() => {
@@ -51,6 +53,11 @@ function Chatlist() {
       unSub();
     };
   }, [currentUser.id]);
+
+  // handling chat selection
+  const handleSelect = async (chat) => {
+    changeChat(chat.chatId, chat.user);
+  };
   return (
     <div>
       {/*search user */}
@@ -79,7 +86,8 @@ function Chatlist() {
           {chats.map((chat) => (
             <div
               className=" flex items-center border-b-2 border-gray-700  gap-[20px] p-[20px]"
-              key={chat.chatId}>
+              key={chat.chatId}
+              onClick={() => handleSelect(chat)}>
               <img
                 className=" w-[50px] h-[50px] object-cover rounded-[50%]"
                 src={chat.user.avatar || profile}

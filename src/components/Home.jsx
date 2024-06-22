@@ -7,11 +7,14 @@ import { auth } from "../lib/firebase";
 import { useUserStore } from "../lib/userStore";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "flowbite-react";
+import { useChatStore } from "../lib/chatStore";
 
 function Home() {
   const navigate = useNavigate();
   // getting and  accessing current user info
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+  const { chatId } = useChatStore();
+
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
       fetchUserInfo(user?.uid);
@@ -36,8 +39,9 @@ function Home() {
       {currentUser ? (
         <div className="bg-[#081b29] h-[90%] w-[90%] rounded-md flex text-white ">
           <List />
-          <Chat />
-          <Details />
+
+          {chatId && <Chat />}
+          {chatId && <Details />}
         </div>
       ) : (
         navigate("/")
