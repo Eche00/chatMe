@@ -28,7 +28,7 @@ function Userinfo() {
     <div className=" flex justify-between items-center p-[20px]">
       <section className=" flex gap-[20px] items-center">
         <img
-          className=" w-[50px] h-[50px] object-cover rounded-[50%]"
+          className=" w-[50px] h-[50px] object-cover rounded-[50%] border-2 border-gray-700"
           src={currentUser.avatar}
           alt=""
         />
@@ -39,8 +39,13 @@ function Userinfo() {
         {" "}
         <MoreHorizIcon fontSize="medium" />
         <VideocamIcon fontSize="medium" />
-        <button className=" bg-blue-800 rounded-md px-1" onClick={signOutUser}>
+        <button
+          className=" bg-blue-800 rounded-md px-1 group relative"
+          onClick={signOutUser}>
           <Logout fontSize="small" />
+          <p className=" opacity-0 group-hover:opacity-100 text-white  absolute left-[110%] bottom-0 top-0 text-sm bg-[rgba(55,65,81,0.60)] px-2 rounded-md">
+            SignOut
+          </p>
         </button>
       </div>
     </div>
