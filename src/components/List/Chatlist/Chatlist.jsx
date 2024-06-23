@@ -1,7 +1,7 @@
 import { SearchRounded } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import Searchchat from "./Searchchat";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useUserStore } from "../../../lib/userStore";
 import { db } from "../../../lib/firebase";
 import { profile } from "../../../assets";
@@ -11,6 +11,7 @@ function Chatlist() {
   //handle add mode
   const [addMode, setAddMode] = useState(false);
   const [chats, setUserChats] = useState([]);
+  const [input, setInput] = useState("");
 
   //getting current user info(id)
   const { currentUser } = useUserStore();
@@ -23,9 +24,8 @@ function Chatlist() {
       doc(db, "userchats", currentUser.id),
       async (res) => {
         // Getting user chats data
-        console.log(res.data());
+
         const items = res.data().chats;
-        console.log(items);
 
         // Fetching user data for each chat item
         const promises = items.map(async (item) => {
@@ -56,8 +56,37 @@ function Chatlist() {
 
   // handling chat selection
   const handleSelect = async (chat) => {
-    changeChat(chat.chatId, chat.user);
+    // for handling seen and unseen messages
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+
+    //finding specific chat to check
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+
+    // handling chat view
+    userChats[chatIndex].isSeen = true;
+
+    //updating userchat
+
+    const userChatRef = doc(db, "userchats", currentUser.id);
+    try {
+      await updateDoc(userChatRef, {
+        chats: userChats,
+      });
+      changeChat(chat.chatId, chat.user);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  // filtering chat by search
+  const filteredChats = chats.filter((e) =>
+    e.user.username.toLowerCase().includes(input.toLowerCase())
+  );
   return (
     <div>
       {/*search user */}
@@ -70,6 +99,7 @@ function Chatlist() {
             className=" flex-1 bg-transparent outline-none"
             type="text"
             placeholder="search..."
+            onChange={(e) => setInput(e.target.value)}
           />
         </div>
         <div
@@ -83,21 +113,40 @@ function Chatlist() {
 
       {!addMode && (
         <div className=" flex flex-col">
-          {chats.map((chat) => (
+          {filteredChats.map((chat) => (
             <div
-              className=" flex items-center border-b-2 border-gray-700  gap-[20px] p-[20px]"
+              className=" flex items-center border-b-2 border-gray-700  gap-[20px] p-[20px] hover:bg-[rgba(92,92,94,0.1)] cursor-pointer"
               key={chat.chatId}
               onClick={() => handleSelect(chat)}>
               <img
                 className=" w-[50px] h-[50px] object-cover rounded-[50%]"
-                src={chat.user.avatar || profile}
+                src={
+                  chat.user.blocked.includes(currentUser.id)
+                    ? profile
+                    : chat.user.avatar || profile
+                }
                 alt=""
               />
-              <div className=" flex flex-col gap-[5px]">
-                <span className=" font-bold">{chat.user.username}</span>
-                <p className=" text-[14px] text-gray-400 p-0">
-                  {chat.lastMessage}
-                </p>
+              <div className=" flex justify-between flex-1 items-center">
+                <div className=" flex flex-col gap-[5px]">
+                  <span className=" font-bold">
+                    {chat.user.blocked.includes(currentUser.id)
+                      ? "User"
+                      : chat.user.username}
+                  </span>
+                  <p
+                    className=" text-[14px]  p-0"
+                    style={{ color: chat?.isSeen ? "white" : "gray-300" }}>
+                    {chat.lastMessage}
+                  </p>
+                </div>
+                <div className=" text-gray-300 text-xs  font-bold">
+                  {chat?.isSeen ? (
+                    ""
+                  ) : (
+                    <div className=" w-[15px] h-[15px] bg-[#5183fe] rounded-full"></div>
+                  )}
+                </div>
               </div>
             </div>
           ))}

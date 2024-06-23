@@ -16,6 +16,7 @@ import { useUserStore } from "../../../lib/userStore";
 
 function Searchchat() {
   const [user, setUser] = useState(null);
+  const [added, setAdded] = useState(false);
   const { currentUser } = useUserStore();
   // handling user search and add
   const handleSearch = async (e) => {
@@ -71,6 +72,7 @@ function Searchchat() {
           updatedAt: Date.now(),
         }),
       });
+      setAdded(true);
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +105,7 @@ function Searchchat() {
               <button
                 onClick={handleAdd}
                 className=" bg-blue-500 rounded-md px-3 py-2">
-                Add user
+                {added ? "Added" : "Add user"}
               </button>
             </div>
           </div>
