@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowBackIos,
   EmailOutlined,
@@ -18,6 +18,7 @@ import { Spinner } from "flowbite-react";
 
 function SignUp() {
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState({
     file: null,
@@ -36,9 +37,11 @@ function SignUp() {
       });
     }
   };
+
   // handling form submit(Registering account)
   const handleRegistration = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     // getting formdata
     const formData = new FormData(e.target);
@@ -75,6 +78,12 @@ function SignUp() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!avatar?.url) {
+      toast.warning("Please select image before sign up");
+    }
+  }, []);
   return (
     <div className=" h-screen flex justify-center items-center   bg-[#081b29]">
       {/* All page */}
@@ -105,10 +114,10 @@ function SignUp() {
           <form
             onSubmit={handleRegistration}
             className="flex flex-col  items-center justify-center">
-            <h2 className="text-gray-300 text-3xl font-serif">Sign Up</h2>
+            <h2 className="text-gray-300 text-3xl font-serif py-10">Sign Up</h2>
             {/* profile image section */}
 
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center justify-between w-full py-2">
               <input
                 type="file"
                 name="avatar"
@@ -120,11 +129,20 @@ function SignUp() {
               <img
                 className=" w-[50px] h-[50px] object-cover rounded-[50%]  cursor-pointer border-2 border-gray-700"
                 onClick={() => profileRef.current.click()}
-                src={avatar.url || profile}
+                src={avatar?.url || profile}
                 alt=""
               />
-              <h2 className=" text-white text-sm font-bold">
-                <ArrowBackIos fontSize="small" /> Upload profile image
+              <h2 className="  bg-gray-600 h-full px-2 rounded-md flex items-center">
+                {avatar.url ? (
+                  <span className="  text-xs font-bold flex items-center gap-[20px] text-white">
+                    <ArrowBackIos fontSize="small" /> Image selected
+                  </span>
+                ) : (
+                  <span className="  text-xs font-bold flex items-center gap-[20px] text-white">
+                    <ArrowBackIos fontSize="small" /> Please select image before
+                    signing up
+                  </span>
+                )}
               </h2>
             </div>
 

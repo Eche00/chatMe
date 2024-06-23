@@ -41,7 +41,7 @@ function Chat() {
   const endRef = useRef(null);
   useEffect(() => {
     endRef.current?.scrollIntoView({ behaviour: "smooth" });
-  }, []);
+  }, [chatId]);
 
   //
   useEffect(() => {
@@ -200,9 +200,9 @@ function Chat() {
         )}
         {/* image */}
         {img.url && <img src={img.url} alt="" />}
-
-        <div ref={endRef}></div>
+        <div ref={endRef}> </div>
       </div>
+
       <div className="bottom flex items-center py-3 border-t-2 border-gray-700 relative">
         <div className=" flex gap-[10px] p-5 mt-auto">
           <span className=" flex items-center">
