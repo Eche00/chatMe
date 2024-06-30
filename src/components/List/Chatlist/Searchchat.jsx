@@ -3,13 +3,14 @@ import {
   collection,
   doc,
   getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../../../lib/firebase";
 import { profile } from "../../../assets";
 import { useUserStore } from "../../../lib/userStore";
@@ -39,6 +40,27 @@ function Searchchat() {
     }
   };
 
+  useState(() => {
+    // using onsnapshot to get chats on page
+    const unSub = onSnapshot(
+      doc(db, "userchats", currentUser.id),
+      async (res) => {
+        // Getting user chats data
+
+        const items = res.data().chats;
+      }
+    );
+
+    const chatRef = collection(db, "chats");
+    const userChatsRef = collection(db, "userchats");
+
+    if (userChatsRef === chatRef) {
+      setAdded(true);
+    } else {
+      setAdded(false);
+    }
+  }, []);
+
   // handling add user
   const handleAdd = async () => {
     //creating user chat db
@@ -48,7 +70,7 @@ function Searchchat() {
     //getting chat info
     try {
       const newchatRef = doc(chatRef);
-
+      if (user.username === userChatsRef.username) return;
       await setDoc(newchatRef, {
         createdAt: serverTimestamp(),
         messages: [],
@@ -72,6 +94,7 @@ function Searchchat() {
           updatedAt: Date.now(),
         }),
       });
+
       setAdded(true);
     } catch (error) {
       console.log(error);
@@ -94,17 +117,18 @@ function Searchchat() {
         </form>
 
         {user && (
-          <div className=" flex items-center border-b-2 border-gray-700  gap-[20px] py-[10px]">
+          <div className=" flex items-center border-b-2 border-gray-700  gap-[20px] py-[10px] hover:bg-[rgba(92,92,94,0.1)] cursor-pointer px-2">
             <img
               className=" w-[50px] h-[50px] object-cover rounded-[50%]"
-              src={user.avatar || profile}
+              src={user?.avatar || profile}
               alt=""
             />
             <div className=" flex items-center justify-between gap-[5px] flex-1">
-              <span className=" font-bold">{user.username}</span>
+              <span className=" font-bold">{user?.username}</span>
               <button
                 onClick={handleAdd}
-                className=" bg-blue-500 rounded-md px-3 py-2">
+                className=" bg-blue-500 rounded-md px-3 py-2"
+                disabled={added}>
                 {added ? "Added" : "Add user"}
               </button>
             </div>

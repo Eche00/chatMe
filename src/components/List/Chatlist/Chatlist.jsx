@@ -103,9 +103,19 @@ function Chatlist() {
           />
         </div>
         <div
-          className=" flex items-center text-2xl   bg-gray-700 px-[10px] rounded-md cursor-pointer"
+          className=" flex items-center text-2xl   bg-gray-700 px-[10px] rounded-md cursor-pointer group relative"
           onClick={() => setAddMode((prev) => !prev)}>
           {addMode ? "-" : "+"}
+
+          {!addMode ? (
+            <p className=" opacity-0 group-hover:opacity-100 text-white  absolute -left-[300%] bottom-0 top-[100%] text-sm bg-[rgba(55,65,81,0.60)] px-2 rounded-md z-50 text-nowrap">
+              Click to search user
+            </p>
+          ) : (
+            <p className=" opacity-0 group-hover:opacity-100 text-white  absolute -left-[500%] bottom-0 top-[100%] text-sm bg-[rgba(55,65,81,0.60)] px-2 rounded-md z-10">
+              click to exit search user
+            </p>
+          )}
         </div>
       </div>
 

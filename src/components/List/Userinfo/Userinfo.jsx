@@ -37,13 +37,12 @@ function Userinfo() {
 
       <div className=" flex gap-[20px]">
         {" "}
-        <MoreHorizIcon fontSize="medium" />
-        <VideocamIcon fontSize="medium" />
+        <MoreHorizIcon fontSize="medium" className=" cursor-not-allowed" />
         <button
           className=" bg-[#5183fe] rounded-md px-1 group relative"
           onClick={signOutUser}>
           <Logout fontSize="small" />
-          <p className=" opacity-0 group-hover:opacity-100 text-white  absolute left-[110%] bottom-0 top-0 text-sm bg-[rgba(55,65,81,0.60)] px-2 rounded-md">
+          <p className=" opacity-0 group-hover:opacity-100 text-white  absolute left-[110%] bottom-0 top-0 text-sm bg-[rgba(55,65,81,0.60)] px-2 rounded-md z-10">
             SignOut
           </p>
         </button>

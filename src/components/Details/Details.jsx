@@ -5,17 +5,37 @@ import {
   PrivacyTip,
   Settings,
 } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
 import { profile } from "../../assets";
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
 function Details() {
+  const [chat, setChat] = useState();
   // getting chat info from chat store and current user from userstore
+
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
     useChatStore();
+
+  // getting all images
+  useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [chatId]);
+
   const { currentUser } = useUserStore();
   // handle block user
   const handleBlock = async (e) => {
@@ -35,8 +55,9 @@ function Details() {
       console.log(error);
     }
   };
+
   return (
-    <div className=" flex-1">
+    <div className=" flex-1 overflow-scroll">
       <div className=" flex flex-col items-center py-[30px] px-[20px] gap-[20px] border-b-2 border-gray-700">
         <img
           className=" w-[100px] h-[100px] object-cover rounded-[50%]"
@@ -63,24 +84,17 @@ function Details() {
               <ArrowCircleDownSharp />
             </div>
             <div className=" flex gap-[20px] flex-wrap">
-              <div className=" relative">
-                <img
-                  className=" w-[80px] h-[80px] object-cover  rounded-md"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
-                  alt=""
-                />
-                <Download className=" absolute cursor-pointer top-0 left-0 bg-gray-500 rounded-md" />
-                <span>photo name</span>
-              </div>
-              <div className=" relative">
-                <img
-                  className=" w-[80px] h-[80px] object-cover  rounded-md"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s"
-                  alt=""
-                />
-                <Download className=" absolute cursor-pointer top-0 left-0 bg-gray-500 rounded-md" />
-                <span>photo name</span>
-              </div>
+              {chat?.messages?.map((m) => (
+                <div className=" relative" key={m.createdAt}>
+                  <img
+                    className=" w-[80px] h-[80px] object-cover  rounded-md"
+                    src={m.img}
+                    alt=""
+                  />
+                  <Download className=" absolute cursor-pointer top-0 left-0 bg-gray-500 rounded-md" />
+                  <span>photo name</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -91,12 +105,12 @@ function Details() {
         </div>
         <div className=" flex items-center justify-center">
           <button
-            className=" w-[90%] bg-red-600 hover:bg-red-500 p-[20px] rounded-[10px] capitalize"
+            className=" w-[90%] bg-red-600 hover:bg-red-500 p-[20px] rounded-[10px] capitalize my-20"
             onClick={handleBlock}>
             {isCurrentUserBlocked
               ? "You are blocked!"
               : isReceiverBlocked
-              ? "User blocked!"
+              ? "Unblock user"
               : "Block user"}
           </button>
         </div>{" "}
