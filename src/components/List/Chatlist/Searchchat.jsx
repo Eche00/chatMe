@@ -14,11 +14,15 @@ import React, { useEffect, useState } from "react";
 import { db } from "../../../lib/firebase";
 import { profile } from "../../../assets";
 import { useUserStore } from "../../../lib/userStore";
+import { useChatStore } from "../../../lib/chatStore";
 
-function Searchchat() {
+function Searchchat({ setAddMode }) {
   const [user, setUser] = useState(null);
   const [added, setAdded] = useState(false);
   const { currentUser } = useUserStore();
+  const [chats, setUserChats] = useState([]);
+  const { chatId, changeChat } = useChatStore();
+
   // handling user search and add
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -56,13 +60,16 @@ function Searchchat() {
 
     if (userChatsRef === chatRef) {
       setAdded(true);
+      /////////////////////////////////
     } else {
       setAdded(false);
     }
   }, []);
 
   // handling add user
-  const handleAdd = async () => {
+  const handleAdd = async (chat) => {
+    setAdded(true);
+
     //creating user chat db
     const chatRef = collection(db, "chats");
     const userChatsRef = collection(db, "userchats");
@@ -95,11 +102,14 @@ function Searchchat() {
         }),
       });
 
-      setAdded(true);
+      setAddMode(false);
+
+      ////////////
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <div className=" w-full h-fit mx-auto   p-[20px]">
       <div className=" flex   gap-[20px] flex-col">
@@ -112,9 +122,13 @@ function Searchchat() {
             type="text"
             placeholder="search..."
             name="username"
+            autoFocus
           />
           <button className=" bg-blue-500 rounded-md px-3 py-2">Search</button>
         </form>
+        {!user && (
+          <h1 className=" text-4xl text-gray-300 text-center">Search Users</h1>
+        )}
 
         {user && (
           <div className=" flex items-center border-b-2 border-gray-700  gap-[20px] py-[10px] hover:bg-[rgba(92,92,94,0.1)] cursor-pointer px-2">
@@ -127,7 +141,7 @@ function Searchchat() {
               <span className=" font-bold">{user?.username}</span>
               <button
                 onClick={handleAdd}
-                className=" bg-blue-500 rounded-md px-3 py-2"
+                className=" bg-blue-500 rounded-md px-3 py-2 disabled:cursor-not-allowed"
                 disabled={added}>
                 {added ? "Added" : "Add user"}
               </button>

@@ -123,48 +123,61 @@ function Chatlist() {
 
       {!addMode && (
         <div className=" flex flex-col">
-          {filteredChats.map((chat) => (
-            <div
-              className=" flex items-center border-b-2 border-gray-700  gap-[20px] p-[20px] hover:bg-[rgba(92,92,94,0.1)] cursor-pointer"
-              key={chat.chatId}
-              onClick={() => handleSelect(chat)}>
-              <img
-                className=" w-[50px] h-[50px] object-cover rounded-[50%]"
-                src={
-                  chat.user.blocked.includes(currentUser.id)
-                    ? profile
-                    : chat.user.avatar || profile
-                }
-                alt=""
-              />
-              <div className=" flex justify-between flex-1 items-center">
-                <div className=" flex flex-col gap-[5px]">
-                  <span className=" font-bold">
-                    {chat.user.blocked.includes(currentUser.id)
-                      ? "User"
-                      : chat.user.username}
-                  </span>
-                  <p
-                    className=" text-[14px]  p-0"
-                    style={{ color: chat?.isSeen ? "white" : "gray-300" }}>
-                    {chat.lastMessage}
-                  </p>
-                </div>
-                <div className=" text-gray-300 text-xs  font-bold">
-                  {chat?.isSeen ? (
-                    ""
-                  ) : (
-                    <div className=" w-[15px] h-[15px] bg-[#5183fe] rounded-full"></div>
-                  )}
-                </div>
+          {filteredChats <= 0 ? (
+            <div className=" flex items-center justify-center">
+              <h2 className="  text-2xl font-bold  text-gray-400 py-5 flex-wrap">
+                You have no Chats, Click to search User
+              </h2>{" "}
+              <div
+                className=" flex items-center text-3xl   bg-gray-700 px-[10px] rounded-md cursor-pointer group relative m-5"
+                onClick={() => setAddMode((prev) => !prev)}>
+                +
               </div>
             </div>
-          ))}
+          ) : (
+            filteredChats.map((chat) => (
+              <div
+                className=" flex items-center border-b-2 border-gray-700  gap-[20px] p-[20px] hover:bg-[rgba(92,92,94,0.1)] cursor-pointer"
+                key={chat.chatId}
+                onClick={() => handleSelect(chat)}>
+                <img
+                  className=" w-[50px] h-[50px] object-cover rounded-[50%]"
+                  src={
+                    chat.user.blocked.includes(currentUser.id)
+                      ? profile
+                      : chat.user.avatar || profile
+                  }
+                  alt=""
+                />
+                <div className=" flex justify-between flex-1 items-center">
+                  <div className=" flex flex-col gap-[5px]">
+                    <span className=" font-bold">
+                      {chat.user.blocked.includes(currentUser.id)
+                        ? "User"
+                        : chat.user.username}
+                    </span>
+                    <p
+                      className=" text-[14px]  p-0"
+                      style={{ color: chat?.isSeen ? "white" : "gray-300" }}>
+                      {chat.lastMessage}
+                    </p>
+                  </div>
+                  <div className=" text-gray-300 text-xs  font-bold">
+                    {chat?.isSeen ? (
+                      ""
+                    ) : (
+                      <div className=" w-[15px] h-[15px] bg-[#5183fe] rounded-full"></div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
       {/* search user, which displays on addMode*/}
-      {addMode && <Searchchat />}
+      {addMode && <Searchchat setAddMode={setAddMode} />}
     </div>
   );
 }

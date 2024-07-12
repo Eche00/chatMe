@@ -84,7 +84,7 @@ function Details() {
               <ArrowCircleDownSharp />
             </div>
             <div className=" flex gap-[20px] flex-wrap">
-              {chat?.messages?.map((m) => (
+              {chat?.messages.map((m) => (
                 <div className=" relative" key={m.createdAt}>
                   <img
                     className=" w-[80px] h-[80px] object-cover  rounded-md"

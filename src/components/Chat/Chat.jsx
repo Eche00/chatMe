@@ -47,13 +47,6 @@ function Chat() {
     useChatStore();
   const { currentUser } = useUserStore();
 
-  // end of chat reference to always move the chat to the current messages
-  const endRef = useRef(null);
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behaviour: "smooth" });
-    setAcess(false);
-  }, [chatId]);
-
   //
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
@@ -64,36 +57,6 @@ function Chat() {
       unSub();
     };
   }, [chatId]);
-
-  // handling camera access
-  const accessCamera = () => {
-    setAcess(true);
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        setStream(stream);
-        const video = document.getElementById("video");
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch((error) => {
-        console.error("Error accessing camera:", error);
-      });
-  };
-
-  // handling image snap
-  const handleTakePhoto = () => {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = canvas.toDataURL("image/png");
-    console.log(imageData[0]);
-    setImg({
-      file: imageData[0],
-      url: imageData,
-    });
-    setAcess(false);
-  };
 
   // handling emoji picker
   const handleEmoji = (e) => {
@@ -114,10 +77,7 @@ function Chat() {
   // handling  sending message
   const handleSend = async (e) => {
     e.preventDefault;
-
-    // handling empty text
-    if (text === "") return;
-
+    setLoading(true);
     // handling img upload
     let imgUrl = null;
 
@@ -128,6 +88,14 @@ function Chat() {
       if (img.file) {
         imgUrl = await upload(img.file);
       }
+
+      // handling empty text or empty img text
+
+      if (text === "" && !imgUrl) {
+        setLoading(false);
+        return;
+      }
+
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           senderId: currentUser.id,
@@ -161,8 +129,10 @@ function Chat() {
           });
         }
       });
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
     setImg({
       file: null,
@@ -170,6 +140,25 @@ function Chat() {
     });
     setText("");
   };
+
+  // handling Sending message on keydown
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      handleSend(e);
+    }
+  };
+
+  // end of chat reference to always move the chat to the current messages
+  const endRef = useRef(null);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatId]);
+
+  // handling autofocus on each chat change
+  const inputRef = useRef(null);
+  useEffect(() => {
+    inputRef.current.focus();
+  }, [chatId]);
 
   return (
     <div className=" flex flex-col flex-[100px] border-r-2 border-gray-700 relative">
@@ -189,9 +178,9 @@ function Chat() {
         </section>
         <div className=" flex gap-[20px]">
           {" "}
-          <Call fontSize="medium" />
-          <VideocamIcon fontSize="medium" />
-          <Info fontSize="medium" />
+          <Call fontSize="medium" className="cursor-not-allowed" />
+          <VideocamIcon fontSize="medium" className="cursor-not-allowed" />
+          <Info fontSize="medium" className="cursor-not-allowed" />
         </div>
       </div>
       <div className="center overflow-scroll flex-1 p-[20px] flex flex-col gap-[20px]">
@@ -208,29 +197,11 @@ function Chat() {
               <div className="texts">
                 {message.img && <img src={message.img} alt="" />}
                 <p>{message.text}</p>
-                {/* <span>{message.createdAt.toDateString()}</span> */}
+                <span>{message.createdAt.toLocaleString()}</span>
               </div>
             </div>
           ))}
-          {access === true && (
-            <div className="absolute top-0 left-0 right-0 bottom-0 flex  bg-[rgba(0,0,0,0.60)]  items-center justify-center z-10 ">
-              <div className=" flex flex-col w-fit border-2 border-dashed  p-5 gap-5">
-                <video
-                  className="w-[300px] rounded-md"
-                  id="video"
-                  width="300"
-                  height="300"></video>
-                <canvas id="canvas" width="300" height="300"></canvas>
 
-                {image && (
-                  <img className=" w-[300px]" src={image} alt="Snapped image" />
-                )}
-                <button onClick={handleTakePhoto} className=" bg-blue-500 p-2 ">
-                  <CameraAlt />
-                </button>
-              </div>
-            </div>
-          )}
           {img.url && (
             <div className="absolute top-0 left-0 right-0 bottom-0 flex  bg-[rgba(0,0,0,0.60)]  items-center justify-center">
               <div className=" flex flex-col w-fit border-2 border-dashed  p-5">
@@ -257,7 +228,7 @@ function Chat() {
             </div>
           )}
 
-          <div ref={endRef}></div>
+          <div ref={endRef} />
         </div>
       </div>
 
@@ -276,9 +247,9 @@ function Chat() {
             />
           </span>
           <span className=" flex items-center bg-blue-500 rounded-md p-[2px]">
-            <button onClick={accessCamera}>
+            <button>
               {" "}
-              <CameraAlt className=" cursor-pointer" />
+              <CameraAlt className="  cursor-not-allowed" />
             </button>
           </span>
         </div>
@@ -292,6 +263,8 @@ function Chat() {
                 ? "Add text to send image.."
                 : "Type a message..."
             }
+            ref={inputRef}
+            onKeyDown={handleKeyDown}
             className=" bg-transparent outline-none flex-1 py-1 disabled:cursor-not-allowed"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -312,9 +285,7 @@ function Chat() {
               : ` mx-5 bg-blue-500 p-1 rounded-md cursor-pointer disabled:cursor-not-allowed`
           }
           onClick={handleSend}
-          disabled={
-            isCurrentUserBlocked || isReceiverBlocked || text.length <= 0
-          }>
+          disabled={isCurrentUserBlocked || isReceiverBlocked || loading}>
           <SendOutlined />
         </button>
       </div>
