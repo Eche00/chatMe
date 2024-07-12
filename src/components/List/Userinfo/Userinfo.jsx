@@ -32,16 +32,7 @@ function Userinfo() {
     }
   };
   // handle delete user
-  const handleDeletetUser = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await deleteUser(auth.currentUser);
 
-      navigate("/");
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
   //opening profile section
   const handleProfile = () => {
     setOpen(true);
@@ -100,60 +91,35 @@ function Userinfo() {
             onClick={() => setOpen(false)}>
             <ArrowBack />
           </span>
-          <form
+          <div
             onSubmit={handleSubmit}
             className=" flex flex-col gap-5 w-[50%] mx-auto  items-center">
-            <label htmlFor="img">
-              <img
-                className=" rounded-full cursor-pointer self-center w-[120px] h-[120px] object-cover"
-                src={avatar?.url || currentUser.avatar}
-                alt="profile"
-              />
-            </label>
-
-            <input
-              type="file"
-              id="img"
-              hidden
-              accept="image/*"
-              onChange={handleAvatarUpload}
+            <img
+              className=" rounded-full cursor-pointer self-center w-[120px] h-[120px] object-cover"
+              src={avatar?.url || currentUser.avatar}
+              alt="profile"
             />
 
-            <input
-              id="username"
-              type="text"
-              defaultValue={currentUser.username}
-              placeholder="username"
-              className=" bg-transparent h-10 p-2 text-sm font-bold   text-gray-300 outline-none border-b-2 w-[50%]"
-            />
-            <input
-              id="email"
-              type="email"
-              defaultValue={currentUser.email}
-              placeholder="email"
-              className=" bg-transparent h-10 p-2 text-sm font-bold   text-gray-300 outline-none border-b-2 w-[50%]"
-            />
-            <input
-              id="password"
-              type="password"
-              placeholder="password"
-              className=" bg-transparent h-10 p-2 text-sm font-bold   text-gray-300 outline-none border-b-2 w-[50%]"
-            />
-            <button className=" p-3 px-12 rounded-md bg-blue-800 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 flex">
-              Update
-            </button>
-          </form>
-          <div className=" flex gap-5 py-[20px]">
-            <button
-              className=" p-3 w-[120px]  rounded-md bg-blue-600 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 "
-              onClick={signOutUser}>
-              Log Out
-            </button>{" "}
-            <button
-              className=" p-3 w-[120px] rounded-md bg-red-600 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600"
-              onClick={handleDeletetUser}>
-              Delete User
-            </button>
+            <p className=" bg-transparent h-10 p-2 text-sm font-bold   text-gray-300 outline-none border-b-2 w-[50%]">
+              {currentUser.username}
+            </p>
+            <p className=" bg-transparent h-10 p-2 text-sm font-bold   text-gray-300 outline-none border-b-2 w-[50%]">
+              {currentUser.email}
+            </p>
+            <p className="text-white p-2 flex   bg-gray-600 rounded-md w-[50%] h-40">
+              {currentUser.bio}
+            </p>
+
+            <div className=" flex gap-5 py-[20px] justify-between w-[50%]">
+              <p className="   text-sm font-bold hover:underline disabled:cursor-not-allowed  flex cursor-pointer text-gray-300">
+                Reset Password
+              </p>
+              <button
+                className=" p-3 w-[120px]  rounded-md bg-blue-600 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 "
+                onClick={signOutUser}>
+                Log Out
+              </button>{" "}
+            </div>
           </div>
         </div>
       ) : (

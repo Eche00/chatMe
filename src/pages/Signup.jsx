@@ -45,7 +45,7 @@ function SignUp() {
     setLoading(true);
     // getting formdata
     const formData = new FormData(e.target);
-    const { username, email, password } = Object.fromEntries(formData);
+    const { username, email, password, bio } = Object.fromEntries(formData);
 
     try {
       // creating user with formdata (email & password)
@@ -58,6 +58,7 @@ function SignUp() {
       await setDoc(doc(db, "users", res.user.uid), {
         username,
         email,
+        bio,
         avatar: imgUrl,
         id: res.user.uid,
         blocked: [],
@@ -169,9 +170,20 @@ function SignUp() {
                   name="email"
                   required
                 />
-
-                {/* password */}
               </div>
+              {/*bio */}
+              <div className="text-gray-300 p-2 flex   bg-gray-600 rounded-md w-[100%] h-40">
+                <textarea
+                  className=" bg-transparent  p-1 text-sm font-bold  w-[100%] text-gray-300 outline-none"
+                  name="bio"
+                  placeholder="About your business..."
+                  id=""
+                  cols="10"
+                  rows="10"
+                  required></textarea>
+              </div>
+              {/* password */}
+
               <div className="text-gray-300 px-2 flex justify-center items-center  bg-gray-600 rounded-md w-[100%]">
                 <KeyOutlined />
                 <input

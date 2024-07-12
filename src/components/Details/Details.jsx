@@ -58,7 +58,7 @@ function Details() {
 
   return (
     <div className=" flex-1 overflow-scroll">
-      <div className=" flex flex-col items-center py-[30px] px-[20px] gap-[20px] border-b-2 border-gray-700">
+      <div className=" flex flex-col items-center justify-center py-[30px] px-[20px] gap-[20px] border-b-2 border-gray-700 font-bold">
         <img
           className=" w-[100px] h-[100px] object-cover rounded-[50%]"
           src={user?.avatar || profile}
@@ -66,24 +66,30 @@ function Details() {
         />
         <h2>{user?.username}</h2>
         <p>{user?.email}</p>
+        <p className="text-xl font-bold w-full">
+          Bio: <br />
+          <p className=" text-[14px] text-gray-400  bg-gray-700 p-2 h-fit w-[100%] rounded-md my-1">
+            {user?.bio}
+          </p>
+        </p>
       </div>
 
       <div>
         <div className=" flex flex-col gap-[20px]  p-[20px]">
-          <div className=" flex justify-between hover:bg-gray-700 rounded-md cursor-pointer p-2">
+          {/* <div className=" flex justify-between hover:bg-gray-700 rounded-md cursor-pointer p-2">
             <span>Chat setting</span>
             <Settings />
           </div>
           <div className=" flex justify-between hover:bg-gray-700 rounded-md cursor-pointer p-2">
             <span>Privacy & Help</span>
             <PrivacyTip />
-          </div>
-          <div className=" flex flex-col p-2 bg-gray-700 rounded-md">
+          </div> */}
+          <div className=" flex flex-col p-2 bg-gray-700 rounded-md justify-center">
             <div className=" flex justify-between  cursor-pointer py-2">
               <span>Shared images</span>
               <ArrowCircleDownSharp />
             </div>
-            <div className=" flex gap-[20px] flex-wrap">
+            <div className=" flex gap-[20px] flex-wrap items-center justify-center">
               {chat?.messages.map((m) => (
                 <div className=" relative" key={m.createdAt}>
                   <img

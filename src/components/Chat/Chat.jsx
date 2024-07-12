@@ -13,6 +13,7 @@ import {
 } from "@mui/icons-material";
 import EmojiPicker from "emoji-picker-react";
 import {
+  Timestamp,
   arrayUnion,
   doc,
   getDoc,
@@ -95,7 +96,6 @@ function Chat() {
         setLoading(false);
         return;
       }
-
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           senderId: currentUser.id,
@@ -104,6 +104,7 @@ function Chat() {
           ...(imgUrl && { img: imgUrl }),
         }),
       });
+
       //creating a loop to keep users updated by last messages
       const userIDs = [currentUser.id, user.id];
 
@@ -160,6 +161,7 @@ function Chat() {
     inputRef.current.focus();
   }, [chatId]);
 
+  const date = new Date();
   return (
     <div className=" flex flex-col flex-[100px] border-r-2 border-gray-700 relative">
       <div className=" flex justify-between items-center p-[20px] border-b-2 border-gray-700">
@@ -171,9 +173,6 @@ function Chat() {
           />
           <div className=" flex flex-col gap-[5px]">
             <span className=" font-bold">{user?.username}</span>
-            <p className=" text-[14px] text-gray-400 p-0">
-              Lorem ipsum dolor adipisicing elit.
-            </p>
           </div>
         </section>
         <div className=" flex gap-[20px]">
@@ -197,7 +196,13 @@ function Chat() {
               <div className="texts">
                 {message.img && <img src={message.img} alt="" />}
                 <p>{message.text}</p>
-                <span>{message.createdAt.toLocaleString()}</span>
+                <span>
+                  {message.createdAt.toLocaleString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
+                </span>
               </div>
             </div>
           ))}
