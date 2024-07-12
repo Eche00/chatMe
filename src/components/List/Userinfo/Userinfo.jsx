@@ -91,6 +91,7 @@ function Userinfo() {
             onClick={() => setOpen(false)}>
             <ArrowBack />
           </span>
+
           <div
             onSubmit={handleSubmit}
             className=" flex flex-col gap-5 w-[50%] mx-auto  items-center">
@@ -117,7 +118,7 @@ function Userinfo() {
               <button
                 className=" p-3 w-[120px]  rounded-md bg-blue-600 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 "
                 onClick={signOutUser}>
-                Log Out
+                s Log Out
               </button>{" "}
             </div>
           </div>

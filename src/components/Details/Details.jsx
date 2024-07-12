@@ -89,7 +89,7 @@ function Details() {
               <span>Shared images</span>
               <ArrowCircleDownSharp />
             </div>
-            <div className=" flex gap-[20px] flex-wrap items-center justify-center">
+            <div className=" flex gap-[20px] flex-wrap ">
               {chat?.messages.map((m) => (
                 <div className=" relative" key={m.createdAt}>
                   <img

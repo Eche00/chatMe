@@ -196,13 +196,13 @@ function Chat() {
               <div className="texts">
                 {message.img && <img src={message.img} alt="" />}
                 <p>{message.text}</p>
-                <span>
+                {/* <span>
                   {message.createdAt.toLocaleString("en-US", {
                     hour: "2-digit",
                     minute: "2-digit",
                     second: "2-digit",
                   })}
-                </span>
+                </span> */}
               </div>
             </div>
           ))}
