@@ -118,7 +118,7 @@ function Userinfo() {
               <button
                 className=" p-3 w-[120px]  rounded-md bg-blue-600 text-white text-sm font-bold hover:bg-opacity-90 disabled:cursor-not-allowed disabled:bg-blue-600 "
                 onClick={signOutUser}>
-                s Log Out
+                Log Out
               </button>{" "}
             </div>
           </div>

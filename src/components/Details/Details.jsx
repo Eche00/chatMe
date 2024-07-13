@@ -89,17 +89,22 @@ function Details() {
               <span>Shared images</span>
               <ArrowCircleDownSharp />
             </div>
-            <div className=" flex gap-[20px] flex-wrap ">
-              {chat?.messages.map((m) => (
-                <div className=" relative" key={m.createdAt}>
-                  <img
-                    className=" w-[80px] h-[80px] object-cover  rounded-md"
-                    src={m.img}
-                    alt=""
-                  />
-                  <Download className=" absolute cursor-pointer top-0 left-0 bg-gray-500 rounded-md" />
-                  <span>photo name</span>
-                </div>
+            <div className=" flex  flex-wrap ">
+              {chat?.messages.map((image) => (
+                <>
+                  {!image.img ? (
+                    <div></div>
+                  ) : (
+                    <div className="relative m-[10px]">
+                      <img
+                        className=" w-[100px] h-[80px] object-cover  rounded-md"
+                        src={image.img}
+                        alt=""
+                      />
+                      <Download className=" absolute cursor-pointer top-0 left-0 bg-gray-500 rounded-md" />
+                    </div>
+                  )}
+                </>
               ))}
             </div>
           </div>
